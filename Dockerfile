@@ -8,34 +8,23 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts --optimize-autoloader
 
+# Install Node.js for building assets
+RUN apk add --no-cache nodejs npm
+
 # Copy the rest of the application code
 COPY . .
 
 # Generate TypeScript types for Inertia pages
 RUN php artisan wayfinder:generate --with-form
 
+# Install frontend dependencies and build assets
+RUN npm ci && npm run build
+
 # Run artisan commands for production optimization (optional, can also be done in Dokploy post-deploy hook)
 # RUN php artisan optimize:clear
 # RUN php artisan optimize
 
-# --- Stage 2: Node Builder ---
-FROM node:20-alpine AS node_builder
-
-# Install PHP for the wayfinder plugin
-RUN apk add --no-cache php
-
-WORKDIR /app
-
-# Copy vendor directory from builder stage
-COPY --from=builder /app/vendor /app/vendor
-
-COPY package*.json ./
-RUN npm ci
-
-COPY . .
-RUN npm run build
-
-# --- Stage 3: PHP-FPM Runtime ---
+# --- Stage 2: PHP-FPM Runtime ---
 FROM php:8.3-fpm-alpine AS runtime
 
 # Install system dependencies and PHP extensions for Laravel
@@ -67,9 +56,6 @@ WORKDIR /app
 
 # Copy code and vendor directory from the builder stage
 COPY --from=builder /app /app
-
-# Copy built frontend assets from the node builder stage
-COPY --from=node_builder /app/public/build /app/public/build
 
 # Configure Nginx for Laravel (create your own nginx.conf or use a default one)
 COPY docker/nginx/nginx.conf /etc/nginx/http.d/default.conf
