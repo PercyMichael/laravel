@@ -15,10 +15,18 @@ COPY . .
 # RUN php artisan optimize:clear
 # RUN php artisan optimize
 
-# Build frontend assets (adjust for your specific build process, e.g., using Node)
-# If you have frontend assets to build, you can add a Node.js stage here
+# --- Stage 2: Node Builder ---
+FROM node:18-alpine AS node_builder
 
-# --- Stage 2: PHP-FPM Runtime ---
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# --- Stage 3: PHP-FPM Runtime ---
 FROM php:8.3-fpm-alpine AS runtime
 
 # Install system dependencies and PHP extensions for Laravel
@@ -50,6 +58,9 @@ WORKDIR /app
 
 # Copy code and vendor directory from the builder stage
 COPY --from=builder /app /app
+
+# Copy built frontend assets from the node builder stage
+COPY --from=node_builder /app/public/build /app/public/build
 
 # Configure Nginx for Laravel (create your own nginx.conf or use a default one)
 COPY docker/nginx/nginx.conf /etc/nginx/http.d/default.conf
