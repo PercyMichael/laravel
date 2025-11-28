@@ -29,8 +29,11 @@ RUN apk add --no-cache \
     mysql-client \
     imagemagick \
     libzip \
+    libzip-dev \
     libpng \
+    libpng-dev \
     jpeg \
+    libjpeg-turbo-dev \
     freetds \
     freetds-dev \
     # ... add other required libs ...
