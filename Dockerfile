@@ -26,6 +26,9 @@ RUN apk add --no-cache php
 
 WORKDIR /app
 
+# Copy vendor directory from builder stage
+COPY --from=builder /app/vendor /app/vendor
+
 COPY package*.json ./
 RUN npm ci
 
