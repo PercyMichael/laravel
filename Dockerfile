@@ -26,6 +26,7 @@ RUN apk add --no-cache \
     nginx \
     supervisor \
     postgresql-libs \
+    postgresql-dev \
     mysql-client \
     imagemagick \
     libzip \
@@ -37,7 +38,7 @@ RUN apk add --no-cache \
     freetds \
     freetds-dev \
     # ... add other required libs ...
-    && docker-php-ext-install pdo pdo_mysql opcache zip exif pcntl \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql opcache zip exif pcntl \
     && docker-php-ext-configure gd --with-jpeg \
     && docker-php-ext-install gd
 
