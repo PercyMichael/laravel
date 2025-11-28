@@ -11,12 +11,15 @@ RUN composer install --prefer-dist --no-ansi --no-interaction --no-progress --no
 # Copy the rest of the application code
 COPY . .
 
+# Generate TypeScript types for Inertia pages
+RUN php artisan wayfinder:generate --with-form
+
 # Run artisan commands for production optimization (optional, can also be done in Dokploy post-deploy hook)
 # RUN php artisan optimize:clear
 # RUN php artisan optimize
 
 # --- Stage 2: Node Builder ---
-FROM node:18-alpine AS node_builder
+FROM node:20-alpine AS node_builder
 
 WORKDIR /app
 
