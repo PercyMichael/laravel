@@ -41,6 +41,9 @@ RUN apk add --no-cache \
     && docker-php-ext-configure gd --with-jpeg \
     && docker-php-ext-install gd
 
+# Configure PHP-FPM to listen on port 9000
+RUN sed -i 's/listen = .*/listen = 127.0.0.1:9000/' /usr/local/etc/php-fpm.d/www.conf
+
 # Set working directory
 WORKDIR /app
 
