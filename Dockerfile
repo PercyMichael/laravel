@@ -46,10 +46,18 @@ RUN apk add --no-cache \
     # ... add other required libs ...
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql opcache zip exif pcntl \
     && docker-php-ext-configure gd --with-jpeg \
-    && docker-php-ext-install gd
+    && docker-php-ext-install gd \
+    && apk del postgresql-dev libzip-dev libpng-dev libjpeg-turbo-dev freetds-dev
 
 # Configure PHP-FPM to listen on port 9000
 RUN sed -i 's/listen = .*/listen = 127.0.0.1:9000/' /usr/local/etc/php-fpm.d/www.conf
+
+# Configure PHP upload limits for large files
+RUN echo 'upload_max_filesize = 250M' >> /usr/local/etc/php/php.ini && \
+    echo 'post_max_size = 250M' >> /usr/local/etc/php/php.ini && \
+    echo 'max_execution_time = 300' >> /usr/local/etc/php/php.ini && \
+    echo 'max_input_time = 300' >> /usr/local/etc/php/php.ini && \
+    echo 'memory_limit = 256M' >> /usr/local/etc/php/php.ini
 
 # Set working directory
 WORKDIR /app
