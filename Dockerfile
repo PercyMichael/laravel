@@ -47,6 +47,8 @@ COPY --from=builder /app /app
 # Configure Nginx for Laravel (create your own nginx.conf or use a default one)
 COPY docker/nginx/nginx.conf /etc/nginx/http.d/default.conf
 
+COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 # Set permissions
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
