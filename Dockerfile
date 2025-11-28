@@ -21,6 +21,9 @@ RUN php artisan wayfinder:generate --with-form
 # --- Stage 2: Node Builder ---
 FROM node:20-alpine AS node_builder
 
+# Install PHP for the wayfinder plugin
+RUN apk add --no-cache php
+
 WORKDIR /app
 
 COPY package*.json ./
