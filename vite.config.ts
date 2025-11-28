@@ -18,6 +18,7 @@ export default defineConfig({
         }),
         tailwindcss(),
         wayfinder({
+            generate: false,
             formVariants: true,
         }),
     ],
